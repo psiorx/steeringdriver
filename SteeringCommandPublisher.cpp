@@ -9,7 +9,7 @@
 #define THROTTLE_MULTIPLIER 0.5
 
 using namespace std;
-using namespace drc;
+using namespace cars;
 
 int8_t SteeringCommandPublisher::get_message_type(js_event const & jse) const
 {
