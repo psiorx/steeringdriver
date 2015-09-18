@@ -1,6 +1,6 @@
-package cars;
+package drake;
 
-struct driving_control_cmd_t
+struct lcmt_driving_control_cmd_t
 {
   int64_t utime;
 
