@@ -1,8 +1,8 @@
-package drc;
+package drake;
 
-struct driving_control_cmd_t
+struct lcmt_driving_control_cmd_t
 {
-  int64_t utime;
+  int64_t timestamp;
 
   int8_t type;
 
