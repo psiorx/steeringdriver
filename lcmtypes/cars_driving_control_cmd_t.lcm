@@ -1,4 +1,4 @@
-package drc;
+package cars;
 
 struct driving_control_cmd_t
 {
