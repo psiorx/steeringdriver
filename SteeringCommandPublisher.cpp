@@ -61,7 +61,7 @@ lcmt_driving_control_cmd_t SteeringCommandPublisher::build_message(js_event cons
   lcmt_driving_control_cmd_t lcmt_driving_control_cmd;
   int8_t msg_type = get_message_type(jse);
   if (msg_type != UNSUPPORTED_MSG_TYPE) {
-    lcmt_driving_control_cmd.utime = jse.time;
+    lcmt_driving_control_cmd.timestamp = jse.time;
     lcmt_driving_control_cmd.type = msg_type;
     set_message_value(jse, msg_type, lcmt_driving_control_cmd);
   } else {
