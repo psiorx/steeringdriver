@@ -9,7 +9,8 @@
 #define ACCEL_AXIS 1
 #define BRAKE_AXIS 2
 #define MAX_STEERING_ANGLE 5.0*M_PI_2
-#define THROTTLE_MULTIPLIER 0.5
+#define THROTTLE_MULTIPLIER 1.0
+#define BRAKE_MULTIPLIER 1.0
 
 using namespace std;
 using namespace drake;
@@ -49,7 +50,7 @@ void SteeringCommandPublisher::set_message_value(js_event const & jse, const int
       printf("throttle: %lf\n", msg.throttle_value);
     break;
     case BRAKE_MSG_TYPE:
-      msg.brake_value = -0.5*jse.value / scaleFactor + 0.5;
+      msg.brake_value = BRAKE_MULTIPLIER*(-0.5*jse.value / scaleFactor + 0.5);
       printf("brake: %lf\n", msg.brake_value);
     break;
   }
