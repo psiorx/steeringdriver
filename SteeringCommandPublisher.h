@@ -20,6 +20,7 @@ private:
   Joystick m_joystick;  
   lcm::LCM m_lcm;
   std::string m_channel_name;
+  drake::lcmt_driving_control_cmd_t m_last_message;
 };
 
 #endif

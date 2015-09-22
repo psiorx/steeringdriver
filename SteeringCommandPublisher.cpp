@@ -8,7 +8,7 @@
 #define STEERING_AXIS 0
 #define ACCEL_AXIS 1
 #define BRAKE_AXIS 2
-#define MAX_STEERING_ANGLE 5.0*M_PI_2
+#define MAX_STEERING_ANGLE 0.401425728
 #define THROTTLE_MULTIPLIER 1.0
 #define BRAKE_MULTIPLIER 1.0
 
@@ -78,9 +78,8 @@ void SteeringCommandPublisher::publish()
   js_event jse;
   int rc = m_joystick.read_joystick_event(jse);
   if (rc == JOYSTICK_SUCCESS) {
-    lcmt_driving_control_cmd_t lcmt_driving_control_cmd;
-    if (build_message(jse, lcmt_driving_control_cmd)) {
-      m_lcm.publish(m_channel_name, &lcmt_driving_control_cmd);
+    if (build_message(jse, m_last_message)) {
+      m_lcm.publish(m_channel_name, &m_last_message);
     }
   }
 }
