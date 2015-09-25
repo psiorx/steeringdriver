@@ -1,4 +1,5 @@
-cmake_minimum_required (VERSION 2.6)
+cmake_minimum_required (VERSION 3.2 FATAL_ERROR)
 project (Steering)
-add_executable(SteeringCommandDriver Joystick.cpp SteeringCommandPublisher.cpp SteeringCommandDriver.cpp)
+add_executable(SteeringCommandDriver Device.cpp Keyboard.cpp Joystick.cpp SteeringCommandPublisher.cpp SteeringCommandDriver.cpp)
 target_link_libraries(SteeringCommandDriver lcm)
+target_compile_features(SteeringCommandDriver PRIVATE cxx_range_for)

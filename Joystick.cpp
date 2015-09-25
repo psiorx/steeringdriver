@@ -7,47 +7,16 @@
 
 using namespace std;
 
-Joystick::Joystick(string const & device_name) 
-: m_device_name(device_name), m_joystick_fd(-1)
-{
-  open_joystick();
-}
+Joystick::Joystick(string const & device_name) : Device(device_name) {}
 
-Joystick::~Joystick()
-{
-  close_joystick(); 
-}
-
-void Joystick::open_joystick()
-{
-  m_joystick_fd = open(m_device_name.c_str(), O_RDONLY | O_NONBLOCK);
-}
-
-void Joystick::close_joystick()
-{
-  if (is_open()) {
-    close(m_joystick_fd);
-  }
-}
-
-bool Joystick::is_open() const
-{
-  return m_joystick_fd >= 0;
-}
-
-int Joystick::read_joystick_event(js_event & jse) const 
-{
+int Joystick::read_device_event(device_event& event) const {
   int bytes;
+  bytes = read(m_device_fd, &event, sizeof(event)); 
 
-  bytes = read(m_joystick_fd, &jse, sizeof(jse)); 
+  if (bytes == -1) return 0;
+  if (bytes == sizeof(event)) return DEVICE_SUCCESS;
 
-  if (bytes == -1)
-   return 0;
-
-  if (bytes == sizeof(jse))
-   return 1;
-
-  printf("Unexpected bytes from joystick:%d\n", bytes);
-
+  printf("Unexpected bytes from device:%d\n", bytes);
   return -1;  
 }
+

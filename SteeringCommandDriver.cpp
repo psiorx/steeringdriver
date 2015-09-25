@@ -2,12 +2,12 @@
 
 int main(int argc, char *argv[])
 {
-  if (argc != 3) {
-    printf("Usage: SteeringCommandDriver <joystick-device> <lcm-channel>\n e.g. SteeringCommandDriver /dev/input/js0 STEERING_COMMAND\n");
+  if (argc < 2 || argc > 3) {
+    printf("Usage: SteeringCommandDriver [<joystick-device>] <lcm-channel>\n e.g. SteeringCommandDriver /dev/input/js1 STEERING_COMMAND\n");
     exit(1);
   }
 
-  SteeringCommandPublisher steering_publisher(argv[1], argv[2]);
+  SteeringCommandPublisher steering_publisher = (argc == 2) ? SteeringCommandPublisher(argv[1]) : SteeringCommandPublisher(argv[1], argv[2]);
 
   while (steering_publisher.good()) {
     steering_publisher.publish();
