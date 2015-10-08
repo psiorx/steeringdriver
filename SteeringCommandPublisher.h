@@ -23,10 +23,7 @@ struct keyboard_state {
 class SteeringCommandPublisher
 {
 public:
-  // For Joystick Control
   SteeringCommandPublisher(std::string const & device_name, std::string const & channel_name);
-  // For Keyboard Control
-  SteeringCommandPublisher(std::string const& channel_name);
   void publish();
   bool good() const;
 private:
