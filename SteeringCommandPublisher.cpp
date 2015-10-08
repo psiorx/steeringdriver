@@ -109,13 +109,16 @@ void SteeringCommandPublisher::update_keyboard_state(device_event const& event, 
   }
 }
 
-// Joystick Constructor
 SteeringCommandPublisher::SteeringCommandPublisher(string const & device_name, string const & channel_name)
-: m_channel_name(channel_name), m_device(new Joystick(device_name)), m_type(JOYSTICK) { }
-
-// Keyboard Constructor
-SteeringCommandPublisher::SteeringCommandPublisher(string const& channel_name)
-: m_channel_name(channel_name), m_device(new Keyboard()), m_type(KEYBOARD) { }
+: m_channel_name(channel_name) {
+  if (device_name.find("js") != string::npos) {
+    m_device = new Joystick(device_name);
+    m_type = JOYSTICK;
+  } else {
+    m_device = new Keyboard(device_name);
+    m_type = KEYBOARD;
+  }
+}
 
 bool SteeringCommandPublisher::build_message(device_event const & event, drake::lcmt_driving_control_cmd_t & lcmt_driving_control_cmd) {
   int8_t msg_type = get_message_type(event);

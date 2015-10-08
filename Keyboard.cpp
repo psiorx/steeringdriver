@@ -5,9 +5,9 @@
 #include <unistd.h>
 #include <stdio.h>
 
-#define KEYBOARD_DEVICE_NAME "/dev/input/event3"
+using namespace std;
 
-Keyboard::Keyboard() : Device(KEYBOARD_DEVICE_NAME) {};
+Keyboard::Keyboard(string const & device_name) : Device(device_name) {};
 
 int Keyboard::read_device_event(device_event& event) const {
   int bytes;

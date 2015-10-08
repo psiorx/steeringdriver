@@ -6,7 +6,7 @@
 
 class Keyboard : public Device {
  public:
-  Keyboard();
+  Keyboard(std::string const & device_name);
   ~Keyboard() {}
   int read_device_event(device_event& event) const;
 };
