@@ -36,9 +36,8 @@ class JoystickEventProcessor:
     pygame.event.set_allowed(None)
     pygame.event.set_allowed([pygame.QUIT, pygame.JOYAXISMOTION])
     if pygame.joystick.get_count() == 0:
-      print 'ERROR: No joysticks detected'
       pygame.quit()
-      sys.exit()
+      sys.exit('ERROR: No joysticks detected')
     joysticks = [pygame.joystick.Joystick(x) for x in xrange(pygame.joystick.get_count())]
     self.joystick = None
     for joystick in joysticks:
@@ -46,15 +45,14 @@ class JoystickEventProcessor:
         self.joystick = joystick
         break
     if self.joystick == None:
-      print 'ERROR: Joystick with system name "%s" not detected' % (joy_name)
       pygame.quit()
-      sys.exit()
+      sys.exit('ERROR: Joystick with system name "%s" not detected' % (joy_name))
     self.joystick.init()
 
   def processEvent(self, event, last_msg):
     new_msg = copy.copy(last_msg)
     if event.axis == STEERING_AXIS:
-      new_msg.steering_angle = event.value * MAX_STEERING_ANGLE
+      new_msg.steering_angle = -1 * event.value * MAX_STEERING_ANGLE
     elif event.axis == ACCEL_AXIS:
       new_msg.throttle_value = -0.5 * event.value + 0.5
     elif event.axis == BRAKE_AXIS:
