@@ -32,14 +32,23 @@ class KeyboardEventProcessor:
     return new_msg
 
 class JoystickEventProcessor:
-  def __init__(self):
+  def __init__(self, joy_name):
     pygame.event.set_allowed(None)
     pygame.event.set_allowed([pygame.QUIT, pygame.JOYAXISMOTION])
     if pygame.joystick.get_count() == 0:
       print 'ERROR: No joysticks detected'
       pygame.quit()
       sys.exit()
-    self.joystick = pygame.joystick.Joystick(0)
+    joysticks = [pygame.joystick.Joystick(x) for x in xrange(pygame.joystick.get_count())]
+    self.joystick = None
+    for joystick in joysticks:
+      if joystick.get_name() == joy_name:
+        self.joystick = joystick
+        break
+    if self.joystick == None:
+      print 'ERROR: Joystick with system name "%s" not detected' % (joy_name)
+      pygame.quit()
+      sys.exit()
     self.joystick.init()
 
   def processEvent(self, event, last_msg):
@@ -47,14 +56,14 @@ class JoystickEventProcessor:
     if event.axis == STEERING_AXIS:
       new_msg.steering_angle = event.value * MAX_STEERING_ANGLE
     elif event.axis == ACCEL_AXIS:
-      new_msg.throttle_value = event.value
+      new_msg.throttle_value = -0.5 * event.value + 0.5
     elif event.axis == BRAKE_AXIS:
-      new_msg.brake_value = event.value
+      new_msg.brake_value = -0.5 * event.value + 0.5
     return new_msg
 
 
 class SteeringCommandPublisher:
-  def __init__(self, input_method, lcm_tag):
+  def __init__(self, input_method, lcm_tag, joy_name):
     print 'Initializing...'
     pygame.init()
     self.screen = pygame.display.set_mode((300,70))
@@ -63,7 +72,7 @@ class SteeringCommandPublisher:
     if input_method == 'keyboard':
       self.event_processor = KeyboardEventProcessor();
     else:
-      self.event_processor = JoystickEventProcessor();
+      self.event_processor = JoystickEventProcessor(joy_name);
     self.last_msg = lcm_msg()
     self.lc = lcm.LCM()
     self.lcm_tag = lcm_tag
@@ -100,8 +109,10 @@ if __name__ == '__main__':
       help='the input method to use for publishing LCM steering commands (default keyboard)')
   parser.add_argument('--lcm_tag', default='STEERING_DRIVER',
       help='tag to publish the LCM messages with (default STEERING_DRIVER)')
+  parser.add_argument('--joy_name', default='Driving Force GT',
+      help='system name of the joystick (default Driving Force GT)')
   args = parser.parse_args()
 
-  publisher = SteeringCommandPublisher(args.input_method, args.lcm_tag)
+  publisher = SteeringCommandPublisher(args.input_method, args.lcm_tag, args.joy_name)
   publisher.start()
 
