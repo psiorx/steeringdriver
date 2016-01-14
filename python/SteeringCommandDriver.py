@@ -12,7 +12,7 @@ STEERING_BUTTON_STEP_FACTOR = 100
 class KeyboardEventProcessor:
   def __init__(self):
     pygame.event.set_allowed(None)
-    pygame.event.set_allowed([pygame.QUIT, pygame.KEYUP, pygame.KEYDOWN])
+    pygame.event.set_allowed([pygame.QUIT, pygame.KEYDOWN])
     pygame.key.set_repeat(100, 10)
 
   def processEvent(self, event, last_msg):
@@ -34,7 +34,7 @@ class KeyboardEventProcessor:
 class JoystickEventProcessor:
   def __init__(self, joy_name):
     pygame.event.set_allowed(None)
-    pygame.event.set_allowed([pygame.QUIT, pygame.JOYAXISMOTION])
+    pygame.event.set_allowed([pygame.QUIT, pygame.JOYAXISMOTION, pygame.JOYBUTTONDOWN])
     if pygame.joystick.get_count() == 0:
       pygame.quit()
       sys.exit('ERROR: No joysticks detected')
@@ -48,15 +48,28 @@ class JoystickEventProcessor:
       pygame.quit()
       sys.exit('ERROR: Joystick with system name "%s" not detected' % (joy_name))
     self.joystick.init()
+    self.gear = 1
 
   def processEvent(self, event, last_msg):
     new_msg = copy.copy(last_msg)
-    if event.axis == STEERING_AXIS:
-      new_msg.steering_angle = -1 * event.value * MAX_STEERING_ANGLE
-    elif event.axis == ACCEL_AXIS:
-      new_msg.throttle_value = -0.5 * event.value + 0.5
-    elif event.axis == BRAKE_AXIS:
-      new_msg.brake_value = -0.5 * event.value + 0.5
+    if event.type == pygame.JOYAXISMOTION:
+      if event.axis == STEERING_AXIS:
+        new_msg.steering_angle = -1 * event.value * MAX_STEERING_ANGLE
+      elif event.axis == ACCEL_AXIS:
+        new_msg.throttle_value = self.gear * (-0.5 * event.value + 0.5)
+      elif event.axis == BRAKE_AXIS:
+        new_msg.brake_value = -0.5 * event.value + 0.5
+    elif event.type == pygame.JOYBUTTONDOWN:
+      if event.button == 12:
+        # Gear Up
+        old_throttle = last_msg.throttle_value / self.gear
+        self.gear = min(self.gear + 1, 5)
+        new_msg.throttle_value = self.gear * old_throttle
+      elif event.button == 13:
+        # Gear Down
+        old_throttle = last_msg.throttle_value / self.gear
+        self.gear = max(self.gear - 1, 1)
+        new_msg.throttle_value = self.gear * old_throttle
     return new_msg
 
 
