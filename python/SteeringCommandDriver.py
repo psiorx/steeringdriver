@@ -12,7 +12,7 @@ STEERING_BUTTON_STEP_FACTOR = 100
 class KeyboardEventProcessor:
   def __init__(self):
     pygame.event.set_allowed(None)
-    pygame.event.set_allowed([pygame.QUIT, pygame.KEYDOWN])
+    pygame.event.set_allowed([pygame.QUIT, pygame.KEYDOWN, pygame.KEYUP])
     pygame.key.set_repeat(100, 10)
 
   def processEvent(self, event, last_msg):
@@ -118,8 +118,8 @@ if __name__ == '__main__':
   parser = argparse.ArgumentParser(description='Publishes steering commands over LCM')
   parser.add_argument('--input_method', choices=['joystick', 'keyboard'], default='keyboard',
       help='the input method to use for publishing LCM steering commands (default keyboard)')
-  parser.add_argument('--lcm_tag', default='STEERING_DRIVER',
-      help='tag to publish the LCM messages with (default STEERING_DRIVER)')
+  parser.add_argument('--lcm_tag', default='DRIVING_COMMAND',
+      help='tag to publish the LCM messages with (default DRIVING_COMMAND)')
   parser.add_argument('--joy_name', default='Driving Force GT',
       help='system name of the joystick (default Driving Force GT)')
   args = parser.parse_args()
