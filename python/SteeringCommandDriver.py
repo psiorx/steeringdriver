@@ -5,6 +5,7 @@ STEERING_AXIS = 0
 ACCEL_AXIS = 1
 BRAKE_AXIS = 2
 MAX_STEERING_ANGLE = 0.401425728
+MAX_THROTTLE_MULTIPLIER = 5.0
 THROTTLE_MULTIPLIER = 1.0
 BRAKE_MULTIPLIER = 1.0
 STEERING_BUTTON_STEP_FACTOR = 100
@@ -16,6 +17,12 @@ class KeyboardEventProcessor:
     pygame.key.set_repeat(100, 10)
 
   def processEvent(self, event, last_msg):
+    global MAX_STEERING_ANGLE
+    global MAX_THROTTLE_MULTIPLIER
+    global THROTTLE_MULTIPLIER
+    global BRAKE_MULTIPLIER
+    global STEERING_BUTTON_STEP_FACTOR
+
     new_msg = copy.copy(last_msg)
     if event.key == pygame.K_UP:
       new_msg.throttle_value = (event.type==pygame.KEYDOWN) * THROTTLE_MULTIPLIER
@@ -29,6 +36,26 @@ class KeyboardEventProcessor:
       new_msg.steering_angle = max(-1 * MAX_STEERING_ANGLE,
           (MAX_STEERING_ANGLE/STEERING_BUTTON_STEP_FACTOR) * -1 * (event.type==pygame.KEYDOWN)
           + last_msg.steering_angle)
+    elif event.key == pygame.K_1:
+      old_throttle = last_msg.throttle_value / THROTTLE_MULTIPLIER
+      THROTTLE_MULTIPLIER = 1.0
+      new_msg.throttle_value = THROTTLE_MULTIPLIER * old_throttle
+    elif event.key == pygame.K_2:
+      old_throttle = last_msg.throttle_value / THROTTLE_MULTIPLIER
+      THROTTLE_MULTIPLIER = 2.0
+      new_msg.throttle_value = THROTTLE_MULTIPLIER * old_throttle
+    elif event.key == pygame.K_3:
+      old_throttle = last_msg.throttle_value / THROTTLE_MULTIPLIER
+      THROTTLE_MULTIPLIER = 3.0
+      new_msg.throttle_value = THROTTLE_MULTIPLIER * old_throttle
+    elif event.key == pygame.K_4:
+      old_throttle = last_msg.throttle_value / THROTTLE_MULTIPLIER
+      THROTTLE_MULTIPLIER = 4.0
+      new_msg.throttle_value = THROTTLE_MULTIPLIER * old_throttle
+    elif event.key == pygame.K_5:
+      old_throttle = last_msg.throttle_value / THROTTLE_MULTIPLIER
+      THROTTLE_MULTIPLIER = 5.0
+      new_msg.throttle_value = THROTTLE_MULTIPLIER * old_throttle
     return new_msg
 
 class JoystickEventProcessor:
@@ -48,28 +75,35 @@ class JoystickEventProcessor:
       pygame.quit()
       sys.exit('ERROR: Joystick with system name "%s" not detected' % (joy_name))
     self.joystick.init()
-    self.gear = 1
 
   def processEvent(self, event, last_msg):
+    global STEERING_AXIS
+    global ACCEL_AXIS
+    global BRAKE_AXIS
+    global MAX_STEERING_ANGLE
+    global MAX_THROTTLE_MULTIPLIER
+    global THROTTLE_MULTIPLIER
+    global BRAKE_MULTIPLIER
+
     new_msg = copy.copy(last_msg)
     if event.type == pygame.JOYAXISMOTION:
       if event.axis == STEERING_AXIS:
         new_msg.steering_angle = -1 * event.value * MAX_STEERING_ANGLE
       elif event.axis == ACCEL_AXIS:
-        new_msg.throttle_value = self.gear * (-0.5 * event.value + 0.5)
+        new_msg.throttle_value = THROTTLE_MULTIPLIER * (-0.5 * event.value + 0.5)
       elif event.axis == BRAKE_AXIS:
-        new_msg.brake_value = -0.5 * event.value + 0.5
+        new_msg.brake_value = BRAKE_MULTIPLIER * (-0.5 * event.value + 0.5)
     elif event.type == pygame.JOYBUTTONDOWN:
       if event.button == 12:
         # Gear Up
-        old_throttle = last_msg.throttle_value / self.gear
-        self.gear = min(self.gear + 1, 5)
-        new_msg.throttle_value = self.gear * old_throttle
+        old_throttle = last_msg.throttle_value / THROTTLE_MULTIPLIER
+        THROTTLE_MULTIPLIER = min(THROTTLE_MULTIPLIER + 1, MAX_THROTTLE_MULTIPLIER)
+        new_msg.throttle_value = THROTTLE_MULTIPLIER * old_throttle
       elif event.button == 13:
         # Gear Down
-        old_throttle = last_msg.throttle_value / self.gear
-        self.gear = max(self.gear - 1, 1)
-        new_msg.throttle_value = self.gear * old_throttle
+        old_throttle = last_msg.throttle_value / THROTTLE_MULTIPLIER
+        THROTTLE_MULTIPLIER = max(THROTTLE_MULTIPLIER - 1, 1)
+        new_msg.throttle_value = THROTTLE_MULTIPLIER * old_throttle
     return new_msg
 
 
